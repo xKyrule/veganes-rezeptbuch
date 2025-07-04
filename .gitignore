@@ -1,0 +1,26 @@
+# PHP-typisch: temporäre & sensible Dateien
+*.log
+*.tmp
+*.swp
+*.bak
+*.env
+
+# IDEs & Editoren
+/.idea/
+/.vscode/
+/nbproject/
+/*.sublime-workspace
+*.code-workspace
+
+# Systemdateien
+.DS_Store
+Thumbs.db
+
+# Abhängigkeiten (falls du später Composer nutzt)
+/vendor/
+
+# Node-Module (falls du später Node-Tools einsetzt)
+/node_modules/
+
+# Datenbank-Dumps (optional, siehe Erklärung)
+/database/*.sql
