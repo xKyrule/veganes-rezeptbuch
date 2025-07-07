@@ -3,42 +3,49 @@ require_once '../inc/db.php';
 
 $id = $_GET['id'] ?? null;
 $edit = isset($_GET['edit']) && $_GET['edit'] == 1;
+$entwurf = isset($_GET['entwurf']) && $_GET['entwurf'] == 1;
+echo "TEST!";
+echo "entwurf= ".$entwurf."<br>";
 
 $rezept = [
-    'titel' => '',
-    'anleitung' => '',
+  'titel' => '',
+  'anleitung' => '',
 ];
 
 $kategorienIds = [];
 $zutaten = [];
 
 if ($id) {
-    // Rezeptdaten laden
-    $stmt = $pdo->prepare("SELECT * FROM rezepte WHERE id = ?");
-    $stmt->execute([$id]);
-    $rezept = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$rezept) {
-        echo "<div class='alert alert-danger'>❌ Rezept nicht gefunden.</div>";
-        exit;
-    }
+// Rezeptdaten laden
+  $stmt = $pdo->prepare("SELECT * FROM rezepte WHERE id = ?");
+  $stmt->execute([$id]);
+  $rezept = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Zugehörige Kategorien laden
-    $stmt = $pdo->prepare("SELECT kategorie_id FROM rezept_kategorien WHERE rezept_id = ?");
-    $stmt->execute([$id]);
-    $kategorienIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'kategorie_id');
+  if (!$rezept) {
+      echo "<div class='alert alert-danger'>❌ Rezept nicht gefunden.</div>";
+      exit;
+  }
 
-    // Zutaten zum Rezept laden
-    $stmt = $pdo->prepare("
-        SELECT z.id, z.name, rz.menge
-        FROM zutaten z
-        JOIN rezept_zutat rz ON z.id = rz.zutat_id
-        WHERE rz.rezept_id = ?
-        ORDER BY z.name
-    ");
-    $stmt->execute([$id]);
-    $zutaten = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  // Zugehörige Kategorien laden
+  $stmt = $pdo->prepare("SELECT kategorie_id FROM rezept_kategorien WHERE rezept_id = ?");
+  $stmt->execute([$id]);
+  $kategorienIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'kategorie_id');
+
+  // Zutaten zum Rezept laden
+  $stmt = $pdo->prepare("
+      SELECT z.id, z.name, rz.menge
+      FROM zutaten z
+      JOIN rezept_zutat rz ON z.id = rz.zutat_id
+      WHERE rz.rezept_id = ?
+      ORDER BY z.name
+  ");
+  $stmt->execute([$id]);
+  $zutaten = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
+
 
 // Alle Kategorien laden
 $alleKategorien = $pdo->query("SELECT id, name FROM kategorien ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
@@ -54,9 +61,11 @@ $selectDisabled = !$edit && $id ? "disabled" : "";
   <h5>
     <?php if (!$id): ?>
       📘 Neues Rezept anlegen
+    <?php elseif ($entwurf): ?>
+      📝 Entwurf bearbeiten
     <?php elseif ($edit): ?>
       📝 Rezept bearbeiten
-    <?php else: ?>
+    <?php else:?>
       👁️ Rezept ansehen
     <?php endif; ?>
   </h5>
@@ -133,9 +142,22 @@ $selectDisabled = !$edit && $id ? "disabled" : "";
     <textarea class="form-control" name="anleitung" rows="4" <?= $disabled ?> required><?= htmlspecialchars($rezept['anleitung']) ?></textarea>
   </div>
 
+
+  <?php
+
+  if($entwurf == 1){
+
+  }else{
+    
+  }
+
+  ?>
+
   <?php if ($edit || !$id): ?>
     <button type="submit" class="btn btn-primary"><?= $id ? 'Speichern' : 'Anlegen' ?></button>
   <?php endif; ?>
+
+  <!-- ENTWURF BUTTONS FEHLEN-->
 
   <input type="hidden" name="id" value="<?= $id ?>">
 

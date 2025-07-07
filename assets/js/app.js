@@ -6,6 +6,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchContainer = document.getElementById('searchContainer');
   const inputSuche = document.getElementById('rezeptSuche');
   const ergebnisseContainer = document.getElementById('suchErgebnisse');
+  const btnDraft = document.getElementById('btnDraft');
+
+  //btnDraftEdit
+  btnDraft.addEventListener('click', () => {
+    fetch('ajax/search_recipes.php?q=entwurf')
+      .then(res => res.text())
+      .then(html => {
+        ergebnisseContainer.innerHTML = html;
+
+        // Buttons "Ansehen" und "Bearbeiten"
+        ergebnisseContainer.querySelectorAll('.btn-view').forEach(btn => {
+          btn.addEventListener('click', () => {
+            loadForm(btn.dataset.id, false, btn.dataset.entwurf);
+          });
+        });
+        ergebnisseContainer.querySelectorAll('.btn-edit').forEach(btn => {
+          btn.addEventListener('click', () => {
+            loadForm(btn.dataset.id, true, btn.dataset.entwurf);
+        });
+      });
+    });
+
+  });
+
+
+  fetch('ajax/search_recipes.php?q=lade_alle_rezepte')
+    .then(res => res.text())
+    .then(html => {
+      ergebnisseContainer.innerHTML = html;
+
+      // Buttons "Ansehen" und "Bearbeiten"
+      ergebnisseContainer.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadForm(btn.dataset.id, false, btn.dataset.entwurf);
+        });
+      });
+      ergebnisseContainer.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadForm(btn.dataset.id, true, btn.dataset.entwurf);
+      });
+    });
+  });
 
   function showRecipeForm() {
     if (searchContainer) searchContainer.style.display = 'none';
@@ -135,6 +177,30 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 
+    // Entwurf-Formular laden (neu)
+  //   btnDraftEdit.addEventListener('click', () => {
+  //     fetch('./ajax/get_form_recipe.php?draft=1')
+  //       .then(res => res.text())
+  //       .then(html => {
+  //         recipeContainer.innerHTML = html;
+  //         zutatContainer.innerHTML = '';
+  //         setupAddZutatButton();
+  //         setupRemoveZutatButtons();
+  //         setupRecipeFormSubmit();
+
+  //         const btnBack = document.createElement('button');
+  //         btnBack.className = 'btn btn-outline-danger mt-2 btnBack';
+  //         btnBack.textContent = '⬅️ Zurück';
+  //         btnBack.onclick = () => {
+  //           recipeContainer.innerHTML = '';
+  //           showSearch();
+  //         };
+  //         recipeContainer.appendChild(btnBack);
+
+  //         showRecipeForm();
+  //     });
+  // });
+
   // Zutaten-Formular laden (für neues Zutat hinzufügen)
   btnAddZutat.addEventListener('click', () => {
     fetch('./ajax/get_form_zutat.php')
@@ -190,12 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
           // Buttons "Ansehen" und "Bearbeiten"
           ergebnisseContainer.querySelectorAll('.btn-view').forEach(btn => {
             btn.addEventListener('click', () => {
-              loadForm(btn.dataset.id, false);
+              loadForm(btn.dataset.id, false, btn.dataset.entwurf);
             });
           });
           ergebnisseContainer.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', () => {
-              loadForm(btn.dataset.id, true);
+              loadForm(btn.dataset.id, true, btn.dataset.entwurf);
             });
           });
         });
@@ -203,8 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Rezept laden (View/Edit)
-  function loadForm(id, editable = false) {
-    fetch('ajax/get_form_recipe.php?id=' + id + '&edit=' + (editable ? 1 : 0))
+  function loadForm(id, editable = false, entwurf = false) {
+
+    // alert(entwurf);
+    fetch('ajax/get_form_recipe.php?id=' + id + '&edit=' + (editable ? 1 : 0) +'&entwurf='+entwurf)
       .then(res => res.text())
       .then(html => {
         recipeContainer.innerHTML = html;
